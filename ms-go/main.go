@@ -1,10 +1,11 @@
 package main
 
 import (
-	_ "ms-go/db"
+	"ms-go/consumers"
 	"ms-go/router"
 )
 
 func main() {
+	go consumers.StartKafkaConsumer()
 	router.Run()
 }

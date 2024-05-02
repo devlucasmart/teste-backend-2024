@@ -1,0 +1,12 @@
+{
+    "configurations": [
+        {
+            "type": "go",
+            "name": "debug main.go",
+            "request": "launch",
+            "mode": "auto",
+            "args": [],
+            "program": "/home/lucas/GIT/backend/teste-backend-2024/ms-go/main.go"
+        }
+    ]
+}
