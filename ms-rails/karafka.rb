@@ -3,7 +3,7 @@
 class KarafkaApp < Karafka::App
   setup do |config|
     config.initial_offset = 'latest'
-    config.kafka = { 'bootstrap.servers': 'kafka:29092' }
+    config.kafka = { 'bootstrap.servers': 'kafka:9092' }
     config.client_id = 'ms-rails'
     config.consumer_persistence = !Rails.env.development?
 
