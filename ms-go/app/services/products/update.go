@@ -2,12 +2,14 @@ package products
 
 import (
 	"context"
+	"encoding/json"
 	"ms-go/app/helpers"
 	"ms-go/app/models"
 	"ms-go/db"
 	"net/http"
 	"time"
 
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -38,6 +40,43 @@ func Update(data models.Product, isAPI bool) (*models.Product, error) {
 	defer db.Disconnect()
 
 	if isAPI {
+		product := models.Product{
+			ID:          data.ID,
+			Name:        data.Name,
+			Brand:       data.Brand,
+			Price:       data.Price,
+			Description: data.Description,
+			Stock:       data.Stock,
+			CreatedAt:   data.CreatedAt,
+			UpdatedAt:   data.UpdatedAt,
+		}
+
+		producer, err := kafka.NewProducer(&kafka.ConfigMap{
+			"bootstrap.servers": KafkaServer,
+			"client.id":         "ms-go",
+		})
+		if err != nil {
+			// Handle error creating Kafka producer
+			return nil, err
+		}
+		defer producer.Close()
+
+		topic := KafkaTopic
+		value, err := json.Marshal(product)
+		if err != nil {
+			// Handle error marshalling product to JSON
+			return nil, err
+		}
+
+		err = producer.Produce(&kafka.Message{
+			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+			Value:          value,
+		}, nil)
+
+		if err != nil {
+			// Handle error producing message to Kafka topic
+			return nil, err
+		}
 	}
 
 	return &product, nil
